@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SubSpace — Subscription & Payment Manager</title>
+    <!-- Premium Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- SVG Icon Library (Lucide CDN alternative or built-in SVGs) -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- Background glow gradients for premium depth -->
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+
+    <!-- App Container -->
+    <div id="app">
+        <!-- Auth Screen (Login / Register) -->
+        <div id="auth-screen" class="auth-container card hidden">
+            <div class="auth-header">
+                <div class="logo">
+                    <span class="logo-icon">🪐</span>
+                    <span class="logo-text">SubSpace</span>
+                </div>
+                <p id="auth-subtitle">Manage subscriptions, optimize budgets</p>
+            </div>
+
+            <!-- Tabs -->
+            <div class="auth-tabs">
+                <button id="tab-login" class="tab-btn active" onclick="switchAuthTab('login')">Log In</button>
+                <button id="tab-register" class="tab-btn" onclick="switchAuthTab('register')">Register</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="login-email">Email Address</label>
+                    <input type="email" id="login-email" required placeholder="you@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+            </form>
+
+            <!-- Register Form -->
+            <form id="register-form" class="hidden" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label for="register-email">Email Address</label>
+                    <input type="email" id="register-email" required placeholder="you@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Password (min 6 characters)</label>
+                    <input type="password" id="register-password" required minlength="6" placeholder="••••••••">
+                </div>
+                <div class="form-group">
+                    <label for="register-currency">Default Currency</label>
+                    <select id="register-currency">
+                        <option value="USD">USD ($)</option>
+                        <option value="EUR">EUR (€)</option>
+                        <option value="RUB">RUB (₽)</option>
+                        <option value="GBP">GBP (£)</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Create Account</button>
+            </form>
+            
+            <div id="auth-error" class="alert alert-error hidden"></div>
+        </div>
+
+        <!-- Dashboard Screen -->
+        <div id="dashboard-screen" class="hidden">
+            <!-- Navbar -->
+            <nav class="navbar card">
+                <div class="nav-brand">
+                    <span class="logo-icon">🪐</span>
+                    <span class="logo-text">SubSpace</span>
+                </div>
+                <div class="nav-actions">
+                    <span id="user-email" class="user-email"></span>
+                    <button class="btn btn-secondary btn-sm" onclick="handleLogout()">Logout</button>
+                </div>
+            </nav>
+
+            <!-- Main Layout Grid -->
+            <div class="dashboard-grid">
+                <!-- Left Sidebar: Analytics & Spending -->
+                <div class="dashboard-sidebar">
+                    <!-- Cost Forecast Card -->
+                    <div class="card analytics-card">
+                        <h3 class="card-title">🚀 Expense Forecast</h3>
+                        <div class="forecast-grid">
+                            <div class="forecast-item">
+                                <span class="forecast-label">Next 30 Days</span>
+                                <span id="forecast-30" class="forecast-value">0.00</span>
+                            </div>
+                            <div class="forecast-item">
+                                <span class="forecast-label">Next 90 Days</span>
+                                <span id="forecast-90" class="forecast-value">0.00</span>
+                            </div>
+                            <div class="forecast-item">
+                                <span class="forecast-label">Next 365 Days</span>
+                                <span id="forecast-365" class="forecast-value">0.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Category Share Card (SVG Chart) -->
+                    <div class="card analytics-card">
+                        <h3 class="card-title">📊 Current Month Spend</h3>
+                        <div class="chart-container">
+                            <div id="chart-visual" class="chart-visual">
+                                <!-- SVG Donut Chart populated by JS -->
+                                <svg id="svg-donut" viewBox="0 0 100 100">
+                                    <circle cx="50" cy="50" r="40" fill="transparent" stroke="#1f293d" stroke-width="12"/>
+                                </svg>
+                                <div id="chart-center" class="chart-center">
+                                    <span class="center-total" id="month-total">0.00</span>
+                                    <span class="center-lbl" id="user-currency-lbl">USD</span>
+                                </div>
+                            </div>
+                            <div id="chart-legend" class="chart-legend">
+                                <!-- Legend rows populated by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Area: Subscriptions List -->
+                <div class="dashboard-main">
+                    <div class="main-header">
+                        <h2 class="section-title">Subscriptions</h2>
+                        <button class="btn btn-primary btn-with-icon" onclick="openSubscriptionModal()">
+                            <span>+</span> Add Subscription
+                        </button>
+                    </div>
+
+                    <div id="subs-list-container" class="subs-list">
+                        <!-- Dynamic list items -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Subscription Modal -->
+    <div id="sub-modal" class="modal-backdrop hidden" onclick="closeSubscriptionModal(event)">
+        <div class="modal card" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3 id="modal-title">Add Subscription</h3>
+                <button class="close-btn" onclick="closeSubscriptionModal()">×</button>
+            </div>
+            <form id="sub-form" onsubmit="handleSubSubmit(event)">
+                <input type="hidden" id="sub-id">
+                
+                <div class="form-group">
+                    <label for="sub-title">Title</label>
+                    <input type="text" id="sub-title" required placeholder="Netflix, AWS, Mobile Bill...">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group flex-2">
+                        <label for="sub-amount">Price / Amount</label>
+                        <input type="number" id="sub-amount" step="0.01" min="0.01" required placeholder="9.99">
+                    </div>
+                    <div class="form-group flex-1">
+                        <label for="sub-currency">Currency</label>
+                        <select id="sub-currency">
+                            <option value="USD">USD ($)</option>
+                            <option value="EUR">EUR (€)</option>
+                            <option value="RUB">RUB (₽)</option>
+                            <option value="GBP">GBP (£)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="sub-period">Billing Period</label>
+                        <select id="sub-period">
+                            <option value="month">Monthly</option>
+                            <option value="year">Annually</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="sub-date">Next Payment Date</label>
+                        <input type="date" id="sub-date" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="sub-category">Category</label>
+                    <div class="category-select-wrapper">
+                        <select id="sub-category">
+                            <!-- Populated by JS -->
+                        </select>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="showCustomCategoryInput()">Custom</button>
+                    </div>
+                </div>
+
+                <!-- Custom Category Input (Initially Hidden) -->
+                <div id="custom-category-group" class="form-group hidden">
+                    <label for="custom-category-name">New Category Name</label>
+                    <div class="custom-category-input-row">
+                        <input type="text" id="custom-category-name" placeholder="E.g., Gym, Transport">
+                        <button type="button" class="btn btn-success btn-sm" onclick="saveCustomCategory()">Create</button>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="hideCustomCategoryInput()">Cancel</button>
+                    </div>
+                </div>
+
+                <div class="form-group form-checkbox">
+                    <input type="checkbox" id="sub-active" checked>
+                    <label for="sub-active">Subscription is active</label>
+                </div>
+
+                <div id="modal-error" class="alert alert-error hidden"></div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeSubscriptionModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Subscription</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
