@@ -52,8 +52,6 @@ async def send_welcome_email(to_email: str):
         "- Track your Netflix, AWS, Mobile, and other subscriptions.\n"
         "- Get expense forecasts for the next 30, 90, and 365 days.\n"
         "- Receive timely email notifications 24 hours before your payments are due.\n\n"
-        "Best regards,\n"
-        "SubSpace Team"
     )
     await send_email_async(to_email, subject, body)
 
@@ -65,6 +63,6 @@ async def send_expiration_notification(to_email: str, subs: List[Tuple[str, str,
     body = "Hello!\n\nThis is a reminder that the following subscriptions are due for payment tomorrow:\n\n"
     for title, amount, currency in subs:
         body += f"- {title}: {amount} {currency}\n"
-    body += "\nPlease visit the web panel to manage your subscriptions and record payments.\n\nBest regards,\nSubSpace Team"
+    body += "\nPlease visit the web panel to manage your subscriptions and record payments."
     await send_email_async(to_email, subject, body)
     return await send_email_async(to_email, subject, body)
