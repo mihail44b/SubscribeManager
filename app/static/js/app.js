@@ -199,6 +199,32 @@ async function fetchCurrentUser() {
     currentUser = await response.json();
     document.getElementById('user-email').textContent = currentUser.email;
     document.getElementById('user-currency-lbl').textContent = currentUser.currency;
+    // Sync nav currency dropdown
+    const navCurrency = document.getElementById('nav-currency');
+    if (navCurrency) navCurrency.value = currentUser.currency;
+}
+
+// Currency switcher — updates display labels across the whole page
+async function handleCurrencyChange(newCurrency) {
+    if (!currentUser) return;
+    currentUser.currency = newCurrency;
+
+    // Update donut chart label
+    document.getElementById('user-currency-lbl').textContent = newCurrency;
+
+    // Try to persist to backend (non-critical — ignore errors)
+    try {
+        await fetch(`${API_BASE}/auth/me`, {
+            method: 'PATCH',
+            headers: getHeaders(),
+            body: JSON.stringify({ currency: newCurrency })
+        });
+    } catch (_) {}
+
+    // Reload analytics so forecast values reflect new currency
+    await loadAnalytics();
+    // Re-render subscription list so sub-cost currency label updates
+    renderSubscriptionsList();
 }
 
 async function loadCategories() {
@@ -265,6 +291,7 @@ function renderSubscriptionsList() {
 
                 const categoryName = sub.category ? sub.category.name : 'General';
                 const cardClass = sub.is_active ? 'sub-row card' : 'sub-row card inactive';
+                const displayCurrency = (currentUser && currentUser.currency) ? currentUser.currency : sub.currency;
 
                 // Choose visual category icon
                 let categoryIcon = '💸';
@@ -295,7 +322,7 @@ function renderSubscriptionsList() {
             
             <div class="sub-actions-container">
                 <div class="sub-pricing">
-                    <span class="sub-cost">${sub.amount} ${sub.currency}</span>
+                    <span class="sub-cost">${sub.amount} ${displayCurrency}</span>
                     <span class="sub-freq">/ ${sub.billing_period}</span>
                 </div>
                 <div class="sub-actions">
@@ -357,13 +384,16 @@ async function loadAnalytics() {
     if (!response.ok) throw new Error('Failed to load analytics');
     const analytics = await response.json();
 
+    // Use currentUser.currency so the nav switcher controls the label everywhere
+    const displayCurrency = (currentUser && currentUser.currency) ? currentUser.currency : analytics.currency;
+
     // 1. Update forecasts
-    document.getElementById('forecast-30').textContent = `${analytics.forecast.forecast_30} ${analytics.currency}`;
-    document.getElementById('forecast-90').textContent = `${analytics.forecast.forecast_90} ${analytics.currency}`;
-    document.getElementById('forecast-365').textContent = `${analytics.forecast.forecast_365} ${analytics.currency}`;
+    document.getElementById('forecast-30').textContent = `${analytics.forecast.forecast_30} ${displayCurrency}`;
+    document.getElementById('forecast-90').textContent = `${analytics.forecast.forecast_90} ${displayCurrency}`;
+    document.getElementById('forecast-365').textContent = `${analytics.forecast.forecast_365} ${displayCurrency}`;
 
     // 2. Render SVG Donut and Legend
-    renderSpendChart(analytics.current_month_spend, analytics.currency);
+    renderSpendChart(analytics.current_month_spend, displayCurrency);
 }
 
 function renderSpendChart(spendData, currency) {
@@ -446,7 +476,6 @@ function openSubscriptionModal(subToEdit = null) {
         document.getElementById('sub-id').value = subToEdit.id;
         document.getElementById('sub-title').value = subToEdit.title;
         document.getElementById('sub-amount').value = subToEdit.amount;
-        document.getElementById('sub-currency').value = subToEdit.currency;
         document.getElementById('sub-period').value = subToEdit.billing_period;
         document.getElementById('sub-date').value = subToEdit.next_payment_date;
         document.getElementById('sub-category').value = subToEdit.category_id || '';
@@ -475,7 +504,7 @@ async function handleSubSubmit(event) {
     const id = document.getElementById('sub-id').value;
     const title = document.getElementById('sub-title').value;
     const amount = parseFloat(document.getElementById('sub-amount').value);
-    const currency = document.getElementById('sub-currency').value;
+    const currency = currentUser ? currentUser.currency : 'USD';
     const billing_period = document.getElementById('sub-period').value;
     const next_payment_date = document.getElementById('sub-date').value;
     const category_id = document.getElementById('sub-category').value ? parseInt(document.getElementById('sub-category').value) : null;
