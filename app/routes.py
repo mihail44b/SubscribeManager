@@ -1,6 +1,6 @@
 from datetime import timedelta
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -12,12 +12,17 @@ from app.schemas import (
     SubscriptionCreate, SubscriptionUpdate, SubscriptionResponse, AnalyticsResponse
 )
 from app import crud
+from app.email import send_welcome_email
 
 router = APIRouter()
 
 # --- Auth Routes ---
 @router.post("/auth/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-async def register(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
+async def register(
+    user_in: UserCreate, 
+    background_tasks: BackgroundTasks,
+    db: AsyncSession = Depends(get_db)
+):
     db_user = await crud.get_user_by_email(db, user_in.email)
     if db_user:
         raise HTTPException(
@@ -25,7 +30,9 @@ async def register(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
             detail="A user with this email already exists."
         )
     hashed_password = get_password_hash(user_in.password)
-    return await crud.create_user(db, user_in, hashed_password)
+    db_user = await crud.create_user(db, user_in, hashed_password)
+    background_tasks.add_task(send_welcome_email, db_user.email)
+    return db_user
 
 @router.post("/auth/login", response_model=Token)
 async def login(
