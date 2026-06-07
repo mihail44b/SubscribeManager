@@ -1,25 +1,21 @@
 /* Root variables for styling */
+
 :root {
     --bg-color: #080b11;
     --card-bg: rgba(16, 22, 36, 0.65);
     --card-border: rgba(255, 255, 255, 0.05);
     --card-hover-border: rgba(99, 102, 241, 0.4);
-    
     --text-primary: #f3f4f6;
     --text-secondary: #9ca3af;
     --text-muted: #6b7280;
-    
     --primary: #6366f1;
     --primary-hover: #4f46e5;
     --primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-    
     --success: #10b981;
     --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    
     --warning: #f59e0b;
     --danger: #ef4444;
     --danger-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-    
     --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
@@ -40,9 +36,11 @@ body {
     line-height: 1.5;
 }
 
+
 /* Background glows */
+
 .glow {
-    position: absolute;
+    position: fixed;
     border-radius: 50%;
     filter: blur(130px);
     z-index: -1;
@@ -66,7 +64,9 @@ body {
     right: -100px;
 }
 
+
 /* Premium Card (Glassmorphism) */
+
 .card {
     background: var(--card-bg);
     backdrop-filter: blur(16px);
@@ -81,18 +81,32 @@ body {
     border-color: rgba(255, 255, 255, 0.1);
 }
 
+
 /* Typography */
-h1, h2, h3, h4 {
+
+h1,
+h2,
+h3,
+h4 {
     font-family: var(--font-heading);
     font-weight: 600;
 }
 
+
 /* Auth Container */
+
 .auth-container {
     max-width: 420px;
     width: 90%;
-    margin: 100px auto;
-    padding: 40px 32px;
+    margin: 40px auto;
+    padding: 32px 24px;
+}
+
+@media (min-width: 480px) {
+    .auth-container {
+        margin: 100px auto;
+        padding: 40px 32px;
+    }
 }
 
 .auth-header {
@@ -114,11 +128,18 @@ h1, h2, h3, h4 {
 
 .logo-text {
     font-family: var(--font-heading);
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: 700;
     background: linear-gradient(135deg, #a5b4fc 0%, #818cf8 50%, #c084fc 100%);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
+}
+
+@media (min-width: 480px) {
+    .logo-text {
+        font-size: 2rem;
+    }
 }
 
 .auth-header p {
@@ -155,18 +176,40 @@ h1, h2, h3, h4 {
     font-weight: 600;
 }
 
+
 /* Inputs and Forms */
+
 .form-group {
     margin-bottom: 20px;
 }
 
 .form-row {
     display: flex;
-    gap: 16px;
+    flex-direction: column;
+    gap: 0;
 }
 
-.flex-1 { flex: 1; }
-.flex-2 { flex: 2; }
+.form-row .form-group {
+    margin-bottom: 20px;
+}
+
+@media (min-width: 480px) {
+    .form-row {
+        flex-direction: row;
+        gap: 16px;
+    }
+    .form-row .form-group {
+        margin-bottom: 0;
+    }
+}
+
+.flex-1 {
+    flex: 1;
+}
+
+.flex-2 {
+    flex: 2;
+}
 
 label {
     display: block;
@@ -192,9 +235,16 @@ select {
     font-size: 0.95rem;
     outline: none;
     transition: all 0.2s;
+    color-scheme: dark;
 }
 
-input:focus, select:focus {
+select option {
+    background-color: #1a2035;
+    color: #e2e8f0;
+}
+
+input:focus,
+select:focus {
     border-color: var(--primary);
     background: rgba(255, 255, 255, 0.08);
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
@@ -218,7 +268,9 @@ input:focus, select:focus {
     cursor: pointer;
 }
 
+
 /* Buttons */
+
 .btn {
     display: inline-flex;
     align-items: center;
@@ -272,7 +324,9 @@ input:focus, select:focus {
     border-radius: 6px;
 }
 
+
 /* Alerts */
+
 .alert {
     padding: 12px 16px;
     border-radius: 8px;
@@ -292,26 +346,54 @@ input:focus, select:focus {
     color: #a7f3d0;
 }
 
+
 /* Dashboard Screen Layout */
+
 #dashboard-screen {
     max-width: 1200px;
     width: 95%;
-    margin: 40px auto;
+    margin: 20px auto;
 }
 
+@media (min-width: 768px) {
+    #dashboard-screen {
+        margin: 40px auto;
+    }
+}
+
+
 /* Navbar */
+
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 28px;
-    margin-bottom: 32px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    gap: 12px;
+}
+
+@media (min-width: 768px) {
+    .navbar {
+        padding: 16px 28px;
+        margin-bottom: 32px;
+    }
 }
 
 .user-email {
     color: var(--text-secondary);
     font-size: 0.9rem;
     font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
+
+@media (min-width: 480px) {
+    .user-email {
+        max-width: none;
+    }
 }
 
 .nav-actions {
@@ -320,23 +402,32 @@ input:focus, select:focus {
     gap: 16px;
 }
 
+
 /* Dashboard Grid */
+
 .dashboard-grid {
     display: grid;
-    grid-template-columns: 380px 1fr;
-    gap: 32px;
+    grid-template-columns: 1fr;
+    gap: 24px;
 }
 
-@media (max-width: 900px) {
+@media (min-width: 992px) {
     .dashboard-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 380px 1fr;
+        gap: 32px;
     }
 }
 
 .dashboard-sidebar {
     display: flex;
     flex-direction: column;
-    gap: 32px;
+    gap: 24px;
+}
+
+@media (min-width: 992px) {
+    .dashboard-sidebar {
+        gap: 32px;
+    }
 }
 
 .analytics-card {
@@ -351,7 +442,9 @@ input:focus, select:focus {
     padding-left: 10px;
 }
 
+
 /* Forecast Card details */
+
 .forecast-grid {
     display: flex;
     flex-direction: column;
@@ -379,10 +472,13 @@ input:focus, select:focus {
     font-size: 1.25rem;
     background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
+
 /* Chart Styles */
+
 .chart-container {
     display: flex;
     flex-direction: column;
@@ -430,6 +526,7 @@ input:focus, select:focus {
     justify-content: space-between;
     align-items: center;
     font-size: 0.85rem;
+    gap: 8px;
 }
 
 .legend-left {
@@ -442,6 +539,7 @@ input:focus, select:focus {
     width: 10px;
     height: 10px;
     border-radius: 50%;
+    flex-shrink: 0;
 }
 
 .legend-name {
@@ -451,9 +549,12 @@ input:focus, select:focus {
 .legend-val {
     font-weight: 600;
     color: var(--text-primary);
+    text-align: right;
 }
 
+
 /* Subscriptions Section */
+
 .dashboard-main {
     display: flex;
     flex-direction: column;
@@ -462,8 +563,17 @@ input:focus, select:focus {
 
 .main-header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+@media (min-width: 576px) {
+    .main-header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
 }
 
 .section-title {
@@ -476,12 +586,15 @@ input:focus, select:focus {
     gap: 16px;
 }
 
+
 /* Subscription Row Card */
+
 .sub-row {
-    padding: 20px 24px;
+    padding: 16px;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
     position: relative;
     overflow: hidden;
 }
@@ -494,6 +607,7 @@ input:focus, select:focus {
     display: flex;
     align-items: center;
     gap: 16px;
+    width: 100%;
 }
 
 .sub-avatar {
@@ -507,11 +621,14 @@ input:focus, select:focus {
     justify-content: center;
     font-size: 1.3rem;
     border: 1px solid rgba(99, 102, 241, 0.2);
+    flex-shrink: 0;
 }
 
 .sub-details {
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+    width: 100%;
 }
 
 .sub-name {
@@ -519,12 +636,16 @@ input:focus, select:focus {
     font-size: 1.05rem;
     color: var(--text-primary);
     margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .sub-meta {
     display: flex;
     align-items: center;
-    gap: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
     font-size: 0.8rem;
     color: var(--text-secondary);
 }
@@ -542,7 +663,9 @@ input:focus, select:focus {
     gap: 4px;
 }
 
+
 /* Status markers and badges */
+
 .badge {
     padding: 3px 8px;
     border-radius: 6px;
@@ -564,14 +687,29 @@ input:focus, select:focus {
 }
 
 @keyframes pulse-danger {
-    0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
-    70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    0% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+    }
+}
+
+.sub-actions-container {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 14px;
 }
 
 .sub-pricing {
-    text-align: right;
-    margin-right: 24px;
+    text-align: left;
+    margin-right: 0;
 }
 
 .sub-cost {
@@ -593,12 +731,39 @@ input:focus, select:focus {
     gap: 12px;
 }
 
-.sub-actions-container {
-    display: flex;
-    align-items: center;
+@media (min-width: 640px) {
+    .sub-row {
+        padding: 20px 24px;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: nowrap;
+    }
+    .sub-info-block {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+    .sub-actions-container {
+        flex: 0 0 auto;
+        width: auto;
+        justify-content: flex-end;
+        border-top: none;
+        padding-top: 0;
+        white-space: nowrap;
+    }
+    .sub-pricing {
+        text-align: right;
+        margin-right: 24px;
+        white-space: nowrap;
+    }
+    .sub-actions {
+        flex-wrap: nowrap;
+    }
 }
 
+
 /* Modal Styling */
+
 .modal-backdrop {
     position: fixed;
     top: 0;
@@ -615,15 +780,29 @@ input:focus, select:focus {
 }
 
 .modal {
-    width: 90%;
+    width: 92%;
     max-width: 520px;
-    padding: 32px;
+    padding: 24px 20px;
+    max-height: 90vh;
+    overflow-y: auto;
     animation: modal-enter 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+@media (min-width: 480px) {
+    .modal {
+        padding: 32px;
+    }
+}
+
 @keyframes modal-enter {
-    from { transform: translateY(20px) scale(0.95); opacity: 0; }
-    to { transform: translateY(0) scale(1); opacity: 1; }
+    from {
+        transform: translateY(20px) scale(0.95);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
 }
 
 .modal-header {
@@ -652,7 +831,9 @@ input:focus, select:focus {
     margin-top: 28px;
 }
 
+
 /* Category select custom input */
+
 .category-select-wrapper {
     display: flex;
     gap: 10px;
@@ -660,15 +841,30 @@ input:focus, select:focus {
 
 .custom-category-input-row {
     display: flex;
+    flex-direction: column;
     gap: 10px;
     margin-top: 8px;
+    width: 100%;
 }
 
+@media (min-width: 400px) {
+    .custom-category-input-row {
+        flex-direction: row;
+    }
+    .custom-category-input-row input {
+        flex: 2;
+    }
+}
+
+
 /* Toast System */
+
 .toast {
     position: fixed;
     bottom: 24px;
     right: 24px;
+    left: 24px;
+    text-align: center;
     padding: 16px 24px;
     background: rgba(16, 22, 36, 0.95);
     border-radius: 8px;
@@ -680,17 +876,29 @@ input:focus, select:focus {
     opacity: 0;
 }
 
+@media (min-width: 576px) {
+    .toast {
+        left: auto;
+        max-width: 350px;
+        text-align: left;
+    }
+}
+
 .toast.show {
     transform: translateY(0);
     opacity: 1;
 }
 
+
 /* Utils helper classes */
+
 .hidden {
     display: none !important;
 }
 
+
 /* Action icons inside tables/rows */
+
 .action-icon-btn {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.05);
@@ -730,4 +938,305 @@ input:focus, select:focus {
     background: rgba(239, 68, 68, 0.15);
     border-color: rgba(239, 68, 68, 0.2);
     color: var(--danger);
+}
+
+
+/* ============================================================
+   MOBILE-FIRST IMPROVEMENTS (≤ 640px)
+   ============================================================ */
+
+
+/* Prevent font size zoom on input focus (iOS) */
+
+@supports (-webkit-touch-callout: none) {
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    input[type="date"],
+    select {
+        font-size: 16px;
+    }
+}
+
+
+/* Touch-friendly tap targets */
+
+@media (max-width: 640px) {
+    .btn {
+        min-height: 48px;
+        padding: 12px 20px;
+    }
+    .btn-sm {
+        min-height: 40px;
+        padding: 10px 14px;
+        font-size: 0.85rem;
+    }
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    input[type="date"],
+    select {
+        min-height: 48px;
+        padding: 12px 14px;
+    }
+    .action-icon-btn {
+        width: 44px;
+        height: 44px;
+        font-size: 1.1rem;
+    }
+    .tab-btn {
+        min-height: 48px;
+        font-size: 1rem;
+    }
+    /* Auth screen — full width on very small screens */
+    .auth-container {
+        width: 100%;
+        margin: 0;
+        min-height: 100vh;
+        border-radius: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 32px 20px;
+        border: none;
+    }
+    /* Navbar — tighter on mobile */
+    .navbar {
+        padding: 14px 16px;
+        margin-bottom: 16px;
+        border-radius: 12px;
+    }
+    .nav-brand .logo-text {
+        font-size: 1.15rem;
+    }
+    .user-email {
+        display: none;
+        /* hide email, save space — shown in logout btn tooltip */
+    }
+    /* Dashboard grid — single column, subscriptions first */
+    .dashboard-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+    .dashboard-main {
+        order: 1;
+    }
+    .dashboard-sidebar {
+        order: 2;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        width: 100%;
+    }
+    .analytics-card {
+        width: 100%;
+        padding: 18px;
+    }
+    .forecast-grid {
+        gap: 10px;
+    }
+    .forecast-item {
+        padding: 10px 14px;
+    }
+    /* Dashboard screen — proper padding */
+    #dashboard-screen {
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        padding: 12px 16px 40px;
+        box-sizing: border-box;
+    }
+    .main-header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+    }
+    .section-title {
+        font-size: 1.2rem;
+    }
+    .btn-with-icon {
+        padding: 10px 14px;
+        font-size: 0.9rem;
+        min-height: 44px;
+    }
+    /* Subscription rows — compact on mobile */
+    .sub-row {
+        padding: 14px;
+        gap: 12px;
+    }
+    .sub-avatar {
+        width: 42px;
+        height: 42px;
+        font-size: 1.15rem;
+        border-radius: 10px;
+    }
+    .sub-name {
+        font-size: 0.95rem;
+    }
+    .sub-meta {
+        font-size: 0.75rem;
+        gap: 6px;
+    }
+    .sub-cost {
+        font-size: 1.1rem;
+    }
+    .sub-actions {
+        gap: 8px;
+    }
+    /* Modal — slide-up sheet on mobile */
+    .modal-backdrop {
+        align-items: flex-end;
+        padding: 0;
+    }
+    .modal {
+        width: 100%;
+        max-width: 100%;
+        max-height: 92vh;
+        border-radius: 20px 20px 0 0;
+        padding: 20px 18px 32px;
+        animation: modal-slide-up 0.35s cubic-bezier(0.34, 1.2, 0.64, 1);
+    }
+    @keyframes modal-slide-up {
+        from {
+            transform: translateY(100%);
+            opacity: 0.5;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+    /* Drag handle indicator for bottom sheet feel */
+    .modal::before {
+        content: '';
+        display: block;
+        width: 40px;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 2px;
+        margin: 0 auto 18px;
+    }
+    .modal-header {
+        margin-bottom: 18px;
+    }
+    .modal-header h3 {
+        font-size: 1.1rem;
+    }
+    .modal-actions {
+        flex-direction: column-reverse;
+        gap: 10px;
+        margin-top: 20px;
+    }
+    .modal-actions .btn {
+        width: 100%;
+    }
+    /* Form rows stay stacked on small screens */
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+    .form-group {
+        margin-bottom: 16px;
+    }
+    /* Category select wrapper */
+    .category-select-wrapper {
+        flex-direction: row;
+        gap: 8px;
+    }
+    .category-select-wrapper select {
+        flex: 1;
+    }
+    /* Custom category input */
+    .custom-category-input-row {
+        flex-direction: column;
+        gap: 8px;
+    }
+    /* Toast — full width at bottom with safe area */
+    .toast {
+        bottom: 16px;
+        left: 12px;
+        right: 12px;
+        font-size: 0.9rem;
+        padding: 14px 18px;
+    }
+    /* Chart on mobile — side by side */
+    .chart-container {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 16px;
+        align-items: center;
+    }
+    .chart-visual {
+        width: 120px;
+        height: 120px;
+        flex-shrink: 0;
+    }
+    .center-total {
+        font-size: 1.1rem;
+    }
+    .chart-legend {
+        flex: 1;
+        min-width: 120px;
+        gap: 8px;
+    }
+    .legend-item {
+        font-size: 0.78rem;
+    }
+}
+
+
+/* ============================================================
+   SMALL TABLETS (641px – 991px) — sidebar above, horizontal
+   ============================================================ */
+
+@media (min-width: 641px) and (max-width: 991px) {
+    #dashboard-screen {
+        width: 96%;
+        margin: 24px auto;
+    }
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    .dashboard-sidebar {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+    .analytics-card {
+        padding: 20px;
+    }
+    .modal {
+        width: 88%;
+        max-width: 520px;
+        padding: 28px 24px;
+        border-radius: 16px;
+        animation: modal-enter 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+}
+
+
+/* ============================================================
+   SAFE AREA — notch / home bar support (iOS)
+   ============================================================ */
+
+@supports (padding: max(0px)) {
+    .toast {
+        bottom: max(16px, env(safe-area-inset-bottom));
+    }
+    .auth-container {
+        padding-bottom: max(32px, env(safe-area-inset-bottom));
+    }
+    @media (max-width: 640px) {
+        .modal {
+            padding-bottom: max(32px, env(safe-area-inset-bottom));
+        }
+        #dashboard-screen {
+            padding-bottom: max(80px, calc(env(safe-area-inset-bottom) + 60px));
+        }
+    }
 }
