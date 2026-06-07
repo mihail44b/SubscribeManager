@@ -18,7 +18,7 @@ const CATEGORY_COLORS = [
     '#3b82f6', // Blue
     '#a855f7', // Purple
     '#f97316', // Orange
-    '#14b8a6'  // Teal
+    '#14b8a6' // Teal
 ];
 
 // Document Elements
@@ -244,41 +244,41 @@ function renderSubscriptionsList() {
     }
 
     const today = new Date();
-    today.setHours(0,0,0,0);
+    today.setHours(0, 0, 0, 0);
 
     subscriptionsList.forEach(sub => {
-        const nextDate = new Date(sub.next_payment_date);
-        nextDate.setHours(0,0,0,0);
-        
-        // Calculate days remaining
-        const diffTime = nextDate - today;
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                const nextDate = new Date(sub.next_payment_date);
+                nextDate.setHours(0, 0, 0, 0);
 
-        let statusBadgeHtml = '';
-        if (sub.is_active) {
-            if (diffDays < 0) {
-                statusBadgeHtml = `<span class="badge badge-overdue">Overdue (${Math.abs(diffDays)}d)</span>`;
-            } else if (diffDays <= 2) {
-                statusBadgeHtml = `<span class="badge badge-soon">Due in ${diffDays}d</span>`;
-            }
-        }
+                // Calculate days remaining
+                const diffTime = nextDate - today;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-        const categoryName = sub.category ? sub.category.name : 'General';
-        const cardClass = sub.is_active ? 'sub-row card' : 'sub-row card inactive';
+                let statusBadgeHtml = '';
+                if (sub.is_active) {
+                    if (diffDays < 0) {
+                        statusBadgeHtml = `<span class="badge badge-overdue">Overdue (${Math.abs(diffDays)}d)</span>`;
+                    } else if (diffDays <= 2) {
+                        statusBadgeHtml = `<span class="badge badge-soon">Due in ${diffDays}d</span>`;
+                    }
+                }
 
-        // Choose visual category icon
-        let categoryIcon = '💸';
-        const lowerCat = categoryName.toLowerCase();
-        if (lowerCat.includes('stream') || lowerCat.includes('netflix') || lowerCat.includes('youtube')) categoryIcon = '📺';
-        else if (lowerCat.includes('utilit') || lowerCat.includes('water') || lowerCat.includes('electr')) categoryIcon = '⚡';
-        else if (lowerCat.includes('mobil') || lowerCat.includes('phone') || lowerCat.includes('internet')) categoryIcon = '📱';
-        else if (lowerCat.includes('soft') || lowerCat.includes('cloud') || lowerCat.includes('aws')) categoryIcon = '☁️';
-        else if (lowerCat.includes('service') || lowerCat.includes('sub')) categoryIcon = '⚙️';
-        else if (lowerCat.includes('gym') || lowerCat.includes('fit') || lowerCat.includes('sport')) categoryIcon = '💪';
+                const categoryName = sub.category ? sub.category.name : 'General';
+                const cardClass = sub.is_active ? 'sub-row card' : 'sub-row card inactive';
 
-        const row = document.createElement('div');
-        row.className = cardClass;
-        row.innerHTML = `
+                // Choose visual category icon
+                let categoryIcon = '💸';
+                const lowerCat = categoryName.toLowerCase();
+                if (lowerCat.includes('stream') || lowerCat.includes('netflix') || lowerCat.includes('youtube')) categoryIcon = '📺';
+                else if (lowerCat.includes('utilit') || lowerCat.includes('water') || lowerCat.includes('electr')) categoryIcon = '⚡';
+                else if (lowerCat.includes('mobil') || lowerCat.includes('phone') || lowerCat.includes('internet')) categoryIcon = '📱';
+                else if (lowerCat.includes('soft') || lowerCat.includes('cloud') || lowerCat.includes('aws')) categoryIcon = '☁️';
+                else if (lowerCat.includes('service') || lowerCat.includes('sub')) categoryIcon = '⚙️';
+                else if (lowerCat.includes('gym') || lowerCat.includes('fit') || lowerCat.includes('sport')) categoryIcon = '💪';
+
+                const row = document.createElement('div');
+                row.className = cardClass;
+                row.innerHTML = `
             <div class="sub-info-block">
                 <div class="sub-avatar">${categoryIcon}</div>
                 <div class="sub-details">
@@ -304,8 +304,8 @@ function renderSubscriptionsList() {
                             ✓ Paid
                         </button>
                     ` : ''}
-                    <button class="action-icon-btn" title="Edit" onclick="editSubscription(${sub.id})">✏️</button>
-                    <button class="action-icon-btn btn-delete" title="Delete" onclick="deleteSubscription(${sub.id})">🗑️</button>
+                    <button class="action-icon-btn btn-edit" title="Edit" onclick="editSubscription(${sub.id})"><img src="/static/icons/edit.svg" alt="Edit" class="icon"></button>
+                    <button class="action-icon-btn btn-delete" title="Delete" onclick="deleteSubscription(${sub.id})"><img src="/static/icons/bin.svg" alt="Delete" class="icon"></button>
                 </div>
             </div>
         `;
