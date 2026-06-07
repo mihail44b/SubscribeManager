@@ -37,7 +37,6 @@ class Subscription(Base):
     category_id = Column(Integer, ForeignKey("categories.id", ondelete="SET NULL"), nullable=True)
     title = Column(String(255), nullable=False)
     amount = Column(Numeric(10, 2), nullable=False)
-    currency = Column(String(3), nullable=False)
     billing_period = Column(String(10), nullable=False)
     next_payment_date = Column(Date, nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)

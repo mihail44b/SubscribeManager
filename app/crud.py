@@ -29,6 +29,13 @@ async def create_user(db: AsyncSession, user_in: UserCreate, hashed_password: st
     await db.refresh(db_user)
     return db_user
 
+async def update_user(db: AsyncSession, db_user: User, currency: str) -> User:
+    db_user.currency = currency.upper()
+    db.add(db_user)
+    await db.commit()
+    await db.refresh(db_user)
+    return db_user
+
 # Category CRUD
 async def get_categories(db: AsyncSession, user_id: int) -> List[Category]:
     # Select categories where user_id IS NULL (system default) OR user_id matches current user
@@ -90,7 +97,6 @@ async def create_subscription(db: AsyncSession, sub_in: SubscriptionCreate, user
         category_id=sub_in.category_id,
         title=sub_in.title,
         amount=sub_in.amount,
-        currency=sub_in.currency.upper(),
         billing_period=sub_in.billing_period,
         next_payment_date=sub_in.next_payment_date
     )
@@ -110,8 +116,6 @@ async def update_subscription(
 ) -> Subscription:
     update_data = sub_in.model_dump(exclude_unset=True)
     for field, value in update_data.items():
-        if field == "currency" and value is not None:
-            value = value.upper()
         setattr(db_sub, field, value)
     
     db.add(db_sub)

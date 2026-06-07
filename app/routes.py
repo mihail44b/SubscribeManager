@@ -8,7 +8,7 @@ from app.database import get_db
 from app.auth import get_password_hash, verify_password, create_access_token, get_current_user
 from app.models import User
 from app.schemas import (
-    UserCreate, UserResponse, Token, CategoryCreate, CategoryResponse,
+    UserCreate, UserResponse, UserUpdate, Token, CategoryCreate, CategoryResponse,
     SubscriptionCreate, SubscriptionUpdate, SubscriptionResponse, AnalyticsResponse
 )
 from app import crud
@@ -53,6 +53,16 @@ async def login(
 # Endpoint to fetch details of the currently authenticated user
 @router.get("/auth/me", response_model=UserResponse)
 async def get_me(current_user: User = Depends(get_current_user)):
+    return current_user
+
+@router.patch("/auth/me", response_model=UserResponse)
+async def update_me(
+    user_in: UserUpdate,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    if user_in.currency:
+        return await crud.update_user(db, current_user, user_in.currency)
     return current_user
 
 

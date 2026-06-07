@@ -199,9 +199,31 @@ async function fetchCurrentUser() {
     currentUser = await response.json();
     document.getElementById('user-email').textContent = currentUser.email;
     document.getElementById('user-currency-lbl').textContent = currentUser.currency;
+    // Avatar letter + popover
+    const letter = currentUser.email ? currentUser.email[0].toUpperCase() : '?';
+    const avatarEl = document.getElementById('user-avatar-letter');
+    if (avatarEl) avatarEl.textContent = letter;
+    const popoverEl = document.getElementById('email-popover');
+    if (popoverEl) popoverEl.textContent = currentUser.email;
     // Sync nav currency dropdown
     const navCurrency = document.getElementById('nav-currency');
     if (navCurrency) navCurrency.value = currentUser.currency;
+}
+
+function toggleEmailPopover() {
+    const popover = document.getElementById('email-popover');
+    if (!popover) return;
+    popover.classList.toggle('hidden');
+    if (!popover.classList.contains('hidden')) {
+        setTimeout(() => {
+            document.addEventListener('click', function closePopover(e) {
+                if (!e.target.closest('.user-avatar-wrap')) {
+                    popover.classList.add('hidden');
+                }
+                document.removeEventListener('click', closePopover);
+            });
+        }, 0);
+    }
 }
 
 // Currency switcher — updates display labels across the whole page
@@ -589,7 +611,15 @@ async function saveCustomCategory() {
     }
 }
 
-// Utility function to avoid HTML Injection
+// Format date as "dd month yyyy"
+function formatDate(dateStr) {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    const options = { day: '2-digit', month: 'long', year: 'numeric' };
+    return new Intl.DateTimeFormat('en-GB', options).format(date);
+}
+
+// Utility: escape HTML to prevent injection
 function escapeHTML(str) {
     return str.replace(/[&<>'"]/g,
         tag => ({
@@ -602,22 +632,3 @@ function escapeHTML(str) {
 }
 
 // Format date as "dd month yyyy"
-function formatDate(dateStr) {
-    if (!dateStr) return '';
-    const date = new Date(dateStr);
-    const options = { day: '2-digit', month: 'long', year: 'numeric' };
-    // Use en-GB for day‑month‑year order
-    return new Intl.DateTimeFormat('en-GB', options).format(date);
-}
-
-function escapeHTML(str) {
-    return str.replace(/[&<>'"]/g, 
-        tag => ({
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            "'": '&#39;',
-            '"': '&quot;'
-        }[tag] || tag)
-    );
-}

@@ -402,8 +402,81 @@ select:focus {
     gap: 10px;
 }
 
+/* User avatar wrap — avatar on mobile, email text on desktop */
+.user-avatar-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+}
 
-/* Currency switcher in navbar */
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--primary-gradient);
+    color: white;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
+    transition: box-shadow 0.2s;
+}
+
+.user-avatar-wrap:hover .user-avatar {
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5);
+}
+
+/* Popover tooltip with full email — mobile only */
+.email-popover {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    background: rgba(16, 22, 36, 0.98);
+    border: 1px solid rgba(99, 102, 241, 0.35);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    z-index: 50;
+    pointer-events: none;
+}
+
+.email-popover::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    right: 12px;
+    width: 8px;
+    height: 8px;
+    background: rgba(16, 22, 36, 0.98);
+    border-left: 1px solid rgba(99, 102, 241, 0.35);
+    border-top: 1px solid rgba(99, 102, 241, 0.35);
+    transform: rotate(45deg);
+}
+
+/* Desktop: show email text, hide avatar and popover */
+@media (min-width: 640px) {
+    .user-avatar {
+        display: none;
+    }
+    .user-avatar-wrap {
+        cursor: default;
+    }
+    .email-popover {
+        display: none !important;
+    }
+}
+
+
 
 .currency-switcher {
     position: relative;

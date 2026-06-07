@@ -77,7 +77,11 @@
                     <span class="logo-text">SubSpace</span>
                 </div>
                 <div class="nav-actions">
-                    <span id="user-email" class="user-email"></span>
+                    <div class="user-avatar-wrap" onclick="toggleEmailPopover()">
+                        <div class="user-avatar" id="user-avatar-letter"></div>
+                        <span id="user-email" class="user-email"></span>
+                        <div class="email-popover hidden" id="email-popover"></div>
+                    </div>
                     <div class="currency-switcher">
                         <select id="nav-currency" onchange="handleCurrencyChange(this.value)">
                             <option value="USD">$ USD</option>
