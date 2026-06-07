@@ -300,9 +300,7 @@ function renderSubscriptionsList() {
                 </div>
                 <div class="sub-actions">
                     ${sub.is_active ? `
-                        <button class="action-icon-btn btn-pay" title="Mark as Paid" onclick="paySubscription(${sub.id})">
-                            ✓ Paid
-                        </button>
+                        ${sub.is_paid ? `<span class="badge badge-paid">Paid</span>` : `<button class="action-icon-btn btn-pay" title="Mark as Paid" onclick="paySubscription(${sub.id})">✓ Paid</button>`}
                     ` : ''}
                     <button class="action-icon-btn btn-edit" title="Edit" onclick="editSubscription(${sub.id})"><img src="/static/icons/edit.svg" alt="Edit" class="icon"></button>
                     <button class="action-icon-btn btn-delete" title="Delete" onclick="deleteSubscription(${sub.id})"><img src="/static/icons/bin.svg" alt="Delete" class="icon"></button>
