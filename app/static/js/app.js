@@ -286,7 +286,7 @@ function renderSubscriptionsList() {
                     <div class="sub-meta">
                         <span class="sub-category-badge">${escapeHTML(categoryName)}</span>
                         <span class="sub-date-badge">
-                            📅 Next: ${sub.next_payment_date} 
+                            Next: ${formatDate(sub.next_payment_date)}
                             ${statusBadgeHtml}
                         </span>
                     </div>
@@ -563,6 +563,26 @@ async function saveCustomCategory() {
 }
 
 // Utility function to avoid HTML Injection
+function escapeHTML(str) {
+    return str.replace(/[&<>'"]/g,
+        tag => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            "'": '&#39;',
+            '"': '&quot;'
+        }[tag] || tag));
+}
+
+// Format date as "dd month yyyy"
+function formatDate(dateStr) {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    const options = { day: '2-digit', month: 'long', year: 'numeric' };
+    // Use en-GB for day‑month‑year order
+    return new Intl.DateTimeFormat('en-GB', options).format(date);
+}
+
 function escapeHTML(str) {
     return str.replace(/[&<>'"]/g, 
         tag => ({
