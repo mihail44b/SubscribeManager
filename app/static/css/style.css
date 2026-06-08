@@ -122,13 +122,39 @@ h4 {
     margin-bottom: 8px;
 }
 
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 .logo-icon {
-    font-size: 2rem;
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+    display: block;
+    flex-shrink: 0;
+}
+
+
+/* Navbar logo slightly smaller than auth screen */
+
+.nav-brand .logo-icon {
+    width: 44px;
+    height: 44px;
+}
+
+
+/* Auth screen logo — bigger and more prominent */
+
+.auth-header .logo-icon {
+    width: 64px;
+    height: 64px;
 }
 
 .logo-text {
     font-family: var(--font-heading);
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     font-weight: 700;
     background: linear-gradient(135deg, #a5b4fc 0%, #818cf8 50%, #c084fc 100%);
     -webkit-background-clip: text;
@@ -138,7 +164,7 @@ h4 {
 
 @media (min-width: 480px) {
     .logo-text {
-        font-size: 2rem;
+        font-size: 2.2rem;
     }
 }
 
@@ -402,7 +428,9 @@ select:focus {
     gap: 10px;
 }
 
+
 /* User avatar wrap — avatar on mobile, email text on desktop */
+
 .user-avatar-wrap {
     position: relative;
     display: flex;
@@ -433,7 +461,9 @@ select:focus {
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5);
 }
 
+
 /* Popover tooltip with full email — mobile only */
+
 .email-popover {
     position: absolute;
     top: calc(100% + 10px);
@@ -463,7 +493,9 @@ select:focus {
     transform: rotate(45deg);
 }
 
+
 /* Desktop: show email text, hide avatar and popover */
+
 @media (min-width: 640px) {
     .user-avatar {
         display: none;
@@ -475,8 +507,6 @@ select:focus {
         display: none !important;
     }
 }
-
-
 
 .currency-switcher {
     position: relative;
@@ -1155,6 +1185,10 @@ select:focus {
     }
     .nav-brand .logo-text {
         font-size: 1.1rem;
+    }
+    .nav-brand .logo-icon {
+        width: 26px;
+        height: 26px;
     }
     .nav-actions {
         gap: 8px;
