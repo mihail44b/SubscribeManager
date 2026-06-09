@@ -17,6 +17,12 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd /home/root/subspace/SubscribeManager
+            cd /home/root/subspace
             git pull origin main
+            git reset --hard origin/main
+            docker compose -f /home/root/subspace/docker-compose.yml down
+            docker builder prune -f
             docker compose -f /home/root/subspace/docker-compose.yml up -d --build
+            sudo systemctl reload caddy
+
+
