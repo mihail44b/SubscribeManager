@@ -9,30 +9,73 @@ from app.auth import get_password_hash, verify_password, create_access_token, ge
 from app.models import User
 from app.schemas import (
     UserCreate, UserResponse, UserUpdate, Token, CategoryCreate, CategoryResponse,
-    SubscriptionCreate, SubscriptionUpdate, SubscriptionResponse, AnalyticsResponse
+    SubscriptionCreate, SubscriptionUpdate, SubscriptionResponse, AnalyticsResponse,
+    VerifyEmailRequest, ForgotPasswordRequest, ResetPasswordRequest
 )
 from app import crud
-from app.email import send_welcome_email
+from app.email import send_verification_code_email, send_reset_password_email
 
 router = APIRouter()
 
 # --- Auth Routes ---
 @router.post("/auth/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 async def register(
-    user_in: UserCreate, 
+    user_in: UserCreate,
     background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db)
 ):
     db_user = await crud.get_user_by_email(db, user_in.email)
     if db_user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="A user with this email already exists."
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="A user with this email already exists.")
     hashed_password = get_password_hash(user_in.password)
     db_user = await crud.create_user(db, user_in, hashed_password)
-    background_tasks.add_task(send_welcome_email, db_user.email)
+    # Send verification code instead of welcome email
+    code = await crud.create_verification_code(db, db_user.id, "verify_email")
+    background_tasks.add_task(send_verification_code_email, db_user.email, code)
     return db_user
+
+@router.post("/auth/verify-email")
+async def verify_email(data: VerifyEmailRequest, db: AsyncSession = Depends(get_db)):
+    user = await crud.get_user_by_email(db, data.email)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found.")
+    if user.is_verified:
+        return {"message": "Already verified."}
+    ok = await crud.verify_code(db, user.id, data.code, "verify_email")
+    if not ok:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired code.")
+    await crud.set_user_verified(db, user)
+    access_token = create_access_token(data={"sub": str(user.id)})
+    return {"access_token": access_token, "token_type": "bearer"}
+
+@router.post("/auth/resend-verification")
+async def resend_verification(data: ForgotPasswordRequest, background_tasks: BackgroundTasks, db: AsyncSession = Depends(get_db)):
+    user = await crud.get_user_by_email(db, data.email)
+    if not user or user.is_verified:
+        return {"message": "OK"}  # Silent — don't leak info
+    code = await crud.create_verification_code(db, user.id, "verify_email")
+    background_tasks.add_task(send_verification_code_email, user.email, code)
+    return {"message": "OK"}
+
+@router.post("/auth/forgot-password")
+async def forgot_password(data: ForgotPasswordRequest, background_tasks: BackgroundTasks, db: AsyncSession = Depends(get_db)):
+    user = await crud.get_user_by_email(db, data.email)
+    if user and user.is_verified:
+        code = await crud.create_verification_code(db, user.id, "reset_password")
+        background_tasks.add_task(send_reset_password_email, user.email, code)
+    return {"message": "If this email exists, a reset code has been sent."}
+
+@router.post("/auth/reset-password")
+async def reset_password(data: ResetPasswordRequest, db: AsyncSession = Depends(get_db)):
+    user = await crud.get_user_by_email(db, data.email)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found.")
+    ok = await crud.verify_code(db, user.id, data.code, "reset_password")
+    if not ok:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired code.")
+    hashed = get_password_hash(data.new_password)
+    await crud.update_user_password(db, user, hashed)
+    return {"message": "Password updated successfully."}
 
 @router.post("/auth/login", response_model=Token)
 async def login(
@@ -45,6 +88,11 @@ async def login(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
+        )
+    if not user.is_verified:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Email not verified. Please check your inbox for the verification code.",
         )
     
     access_token = create_access_token(data={"sub": str(user.id)})

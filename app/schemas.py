@@ -26,6 +26,19 @@ class UserResponse(BaseModel):
 class UserUpdate(BaseModel):
     currency: Optional[str] = Field(None, min_length=3, max_length=3)
 
+# Verification & password reset schemas
+class VerifyEmailRequest(BaseModel):
+    email: EmailStr
+    code: str = Field(..., min_length=6, max_length=6)
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+class ResetPasswordRequest(BaseModel):
+    email: EmailStr
+    code: str = Field(..., min_length=6, max_length=6)
+    new_password: str = Field(..., min_length=6)
+
 # Token schemas
 class Token(BaseModel):
     access_token: str

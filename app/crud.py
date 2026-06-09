@@ -5,7 +5,7 @@ from sqlalchemy import select, text, update, delete, and_, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.models import User, Category, Subscription, PaymentHistory
+from app.models import User, Category, Subscription, PaymentHistory, VerificationCode
 from app.schemas import UserCreate, SubscriptionCreate, SubscriptionUpdate, CategoryCreate
 
 # User CRUD
@@ -35,6 +35,68 @@ async def update_user(db: AsyncSession, db_user: User, currency: str) -> User:
     await db.commit()
     await db.refresh(db_user)
     return db_user
+
+# Verification codes
+import random
+import string
+from datetime import datetime, timezone, timedelta
+from app.models import VerificationCode
+
+def generate_code() -> str:
+    return ''.join(random.choices(string.digits, k=6))
+
+async def create_verification_code(db: AsyncSession, user_id: int, purpose: str) -> str:
+    # Invalidate old codes for this user+purpose
+    await db.execute(
+        delete(VerificationCode).where(
+            and_(VerificationCode.user_id == user_id, VerificationCode.purpose == purpose)
+        )
+    )
+    code = generate_code()
+    expires_at = datetime.now(timezone.utc) + timedelta(minutes=15)
+    db_code = VerificationCode(
+        user_id=user_id,
+        code=code,
+        purpose=purpose,
+        expires_at=expires_at
+    )
+    db.add(db_code)
+    await db.commit()
+    return code
+
+async def verify_code(db: AsyncSession, user_id: int, code: str, purpose: str) -> bool:
+    now = datetime.now(timezone.utc)
+    result = await db.execute(
+        select(VerificationCode).where(
+            and_(
+                VerificationCode.user_id == user_id,
+                VerificationCode.code == code,
+                VerificationCode.purpose == purpose,
+                VerificationCode.used == False,
+                VerificationCode.expires_at > now
+            )
+        )
+    )
+    db_code = result.scalars().first()
+    if not db_code:
+        return False
+    db_code.used = True
+    await db.commit()
+    return True
+
+async def set_user_verified(db: AsyncSession, user: User) -> User:
+    user.is_verified = True
+    db.add(user)
+    await db.commit()
+    await db.refresh(user)
+    return user
+
+async def update_user_password(db: AsyncSession, user: User, hashed_password: str) -> User:
+    user.password_hash = hashed_password
+    db.add(user)
+    await db.commit()
+    await db.refresh(user)
+    return user
 
 # Category CRUD
 async def get_categories(db: AsyncSession, user_id: int) -> List[Category]:

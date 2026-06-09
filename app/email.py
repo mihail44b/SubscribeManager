@@ -41,9 +41,6 @@ async def send_email_async(to_email: str, subject: str, body: str) -> bool:
     return await anyio.to_thread.run_sync(send_email_sync, to_email, subject, body)
 
 async def send_welcome_email(to_email: str):
-    """
-    Sends a welcome email to the newly registered user.
-    """
     subject = "Welcome to SubSpace!"
     body = (
         "Hello!\n\n"
@@ -55,14 +52,32 @@ async def send_welcome_email(to_email: str):
     )
     await send_email_async(to_email, subject, body)
 
+async def send_verification_code_email(to_email: str, code: str):
+    subject = "SubSpace — Email Verification Code"
+    body = (
+        f"Hello!\n\n"
+        f"Your email verification code is:\n\n"
+        f"    {code}\n\n"
+        f"The code is valid for 15 minutes.\n\n"
+        f"If you did not register at SubSpace, please ignore this email."
+    )
+    await send_email_async(to_email, subject, body)
+
+async def send_reset_password_email(to_email: str, code: str):
+    subject = "SubSpace — Password Reset Code"
+    body = (
+        f"Hello!\n\n"
+        f"Your password reset code is:\n\n"
+        f"    {code}\n\n"
+        f"The code is valid for 15 minutes.\n\n"
+        f"If you did not request a password reset, please ignore this email."
+    )
+    await send_email_async(to_email, subject, body)
+
 async def send_expiration_notification(to_email: str, subs: List[Tuple[str, str, str]]):
-    """
-    Sends an expiration reminder email listing subscriptions due tomorrow.
-    """
     subject = "Subscription Payment Reminder!"
     body = "Hello!\n\nThis is a reminder that the following subscriptions are due for payment tomorrow:\n\n"
     for title, amount, currency in subs:
         body += f"- {title}: {amount} {currency}\n"
     body += "\nPlease visit the web panel to manage your subscriptions and record payments."
     await send_email_async(to_email, subject, body)
-    return await send_email_async(to_email, subject, body)

@@ -42,6 +42,26 @@ function showScreen(screenId) {
     document.getElementById(screenId).classList.remove('hidden');
 }
 
+// Show sub-form within auth screen
+function showAuthForm(form) {
+    const forms = ['login-form', 'register-form', 'verify-screen', 'forgot-screen', 'reset-screen'];
+    const tabs = document.getElementById('auth-tabs') || document.querySelector('.auth-tabs');
+    forms.forEach(f => document.getElementById(f)?.classList.add('hidden'));
+    document.getElementById('auth-error')?.classList.add('hidden');
+    document.getElementById('verify-error')?.classList.add('hidden');
+    document.getElementById('forgot-error')?.classList.add('hidden');
+    document.getElementById('reset-error')?.classList.add('hidden');
+
+    if (form === 'login' || form === 'register') {
+        if (tabs) tabs.classList.remove('hidden');
+        switchAuthTab(form);
+    } else {
+        if (tabs) tabs.classList.add('hidden');
+        document.getElementById(`${form}-screen`)?.classList.remove('hidden');
+    }
+    showScreen('auth-screen');
+}
+
 // Toggle Login/Register Tabs
 function switchAuthTab(tab) {
     const tabLogin = document.getElementById('tab-login');
@@ -115,6 +135,13 @@ async function handleLogin(event) {
 
         if (!response.ok) {
             const data = await response.json();
+            // 403 = not verified — redirect to verify screen
+            if (response.status === 403) {
+                pendingEmail = email;
+                document.getElementById('verify-email-hint').textContent = email;
+                showAuthForm('verify');
+                return;
+            }
             throw new Error(data.detail || 'Login failed. Check credentials.');
         }
 
@@ -129,6 +156,9 @@ async function handleLogin(event) {
         errDiv.classList.remove('hidden');
     }
 }
+
+// Stores email between screens
+let pendingEmail = '';
 
 async function handleRegister(event) {
     event.preventDefault();
@@ -150,9 +180,88 @@ async function handleRegister(event) {
             throw new Error(data.detail || 'Registration failed.');
         }
 
-        showToast('Registration successful! Please log in.');
-        switchAuthTab('login');
-        document.getElementById('login-email').value = email;
+        pendingEmail = email;
+        document.getElementById('verify-email-hint').textContent = email;
+        showAuthForm('verify');
+        showToast('Check your inbox for the verification code!');
+    } catch (err) {
+        errDiv.textContent = err.message;
+        errDiv.classList.remove('hidden');
+    }
+}
+
+async function handleVerifyEmail() {
+    const code = document.getElementById('verify-code').value.trim();
+    const errDiv = document.getElementById('verify-error');
+    errDiv.classList.add('hidden');
+
+    try {
+        const response = await fetch(`${API_BASE}/auth/verify-email`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify({ email: pendingEmail, code })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.detail || 'Invalid code.');
+
+        API_TOKEN = data.access_token;
+        localStorage.setItem('token', API_TOKEN);
+        showToast('Email verified! Welcome to SubSpace 🪐');
+        showScreen('dashboard-screen');
+        loadDashboardData();
+    } catch (err) {
+        errDiv.textContent = err.message;
+        errDiv.classList.remove('hidden');
+    }
+}
+
+async function handleResendCode() {
+    await fetch(`${API_BASE}/auth/resend-verification`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({ email: pendingEmail })
+    });
+    showToast('Code resent! Check your inbox.');
+}
+
+async function handleForgotPassword() {
+    const email = document.getElementById('forgot-email').value.trim();
+    const errDiv = document.getElementById('forgot-error');
+    errDiv.classList.add('hidden');
+
+    try {
+        await fetch(`${API_BASE}/auth/forgot-password`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify({ email })
+        });
+        pendingEmail = email;
+        showAuthForm('reset');
+        showToast('If this email exists, a code has been sent.');
+    } catch (err) {
+        errDiv.textContent = err.message;
+        errDiv.classList.remove('hidden');
+    }
+}
+
+async function handleResetPassword() {
+    const code = document.getElementById('reset-code').value.trim();
+    const newPassword = document.getElementById('reset-password').value;
+    const errDiv = document.getElementById('reset-error');
+    errDiv.classList.add('hidden');
+
+    try {
+        const response = await fetch(`${API_BASE}/auth/reset-password`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify({ email: pendingEmail, code, new_password: newPassword })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.detail || 'Failed to reset password.');
+
+        showToast('Password updated! Please log in.');
+        showAuthForm('login');
+        document.getElementById('login-email').value = pendingEmail;
     } catch (err) {
         errDiv.textContent = err.message;
         errDiv.classList.remove('hidden');

@@ -45,6 +45,7 @@
                     <input type="password" id="login-password" required placeholder="••••••••">
                 </div>
                 <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+                <button type="button" class="btn btn-link btn-block mt-8" onclick="showAuthForm('forgot')">Forgot password?</button>
             </form>
 
             <form id="register-form" class="hidden" onsubmit="handleRegister(event)">
@@ -69,6 +70,45 @@
             </form>
 
             <div id="auth-error" class="alert alert-error hidden"></div>
+
+            <!-- Verify email screen -->
+            <div id="verify-screen" class="hidden">
+                <p class="auth-hint">A 6-digit code was sent to <strong id="verify-email-hint"></strong></p>
+                <div class="form-group">
+                    <label for="verify-code">Verification Code</label>
+                    <input type="text" id="verify-code" maxlength="6" placeholder="123456" autocomplete="one-time-code">
+                </div>
+                <button class="btn btn-primary btn-block" onclick="handleVerifyEmail()">Confirm Email</button>
+                <button class="btn btn-secondary btn-block mt-8" onclick="handleResendCode()">Resend Code</button>
+                <div id="verify-error" class="alert alert-error hidden"></div>
+            </div>
+
+            <!-- Forgot password screen -->
+            <div id="forgot-screen" class="hidden">
+                <p class="auth-hint">Enter your email and we'll send you a reset code.</p>
+                <div class="form-group">
+                    <label for="forgot-email">Email Address</label>
+                    <input type="email" id="forgot-email" placeholder="you@example.com">
+                </div>
+                <button class="btn btn-primary btn-block" onclick="handleForgotPassword()">Send Reset Code</button>
+                <button class="btn btn-secondary btn-block mt-8" onclick="showAuthForm('login')">Back to Login</button>
+                <div id="forgot-error" class="alert alert-error hidden"></div>
+            </div>
+
+            <!-- Reset password screen -->
+            <div id="reset-screen" class="hidden">
+                <p class="auth-hint">Enter the code from your email and choose a new password.</p>
+                <div class="form-group">
+                    <label for="reset-code">Reset Code</label>
+                    <input type="text" id="reset-code" maxlength="6" placeholder="123456" autocomplete="one-time-code">
+                </div>
+                <div class="form-group">
+                    <label for="reset-password">New Password</label>
+                    <input type="password" id="reset-password" minlength="6" placeholder="••••••••">
+                </div>
+                <button class="btn btn-primary btn-block" onclick="handleResetPassword()">Set New Password</button>
+                <div id="reset-error" class="alert alert-error hidden"></div>
+            </div>
         </div>
 
         <div id="dashboard-screen" class="hidden">

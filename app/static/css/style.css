@@ -122,39 +122,16 @@ h4 {
     margin-bottom: 8px;
 }
 
-.nav-brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
 .logo-icon {
-    width: 44px;
-    height: 44px;
+    font-size: 2rem;
+    width: 32px;
+    height: 32px;
     object-fit: contain;
-    display: block;
-    flex-shrink: 0;
-}
-
-
-/* Navbar logo slightly smaller than auth screen */
-
-.nav-brand .logo-icon {
-    width: 44px;
-    height: 44px;
-}
-
-
-/* Auth screen logo — bigger and more prominent */
-
-.auth-header .logo-icon {
-    width: 64px;
-    height: 64px;
 }
 
 .logo-text {
     font-family: var(--font-heading);
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     font-weight: 700;
     background: linear-gradient(135deg, #a5b4fc 0%, #818cf8 50%, #c084fc 100%);
     -webkit-background-clip: text;
@@ -164,7 +141,7 @@ h4 {
 
 @media (min-width: 480px) {
     .logo-text {
-        font-size: 2.2rem;
+        font-size: 2rem;
     }
 }
 
@@ -1186,10 +1163,6 @@ select:focus {
     .nav-brand .logo-text {
         font-size: 1.1rem;
     }
-    .nav-brand .logo-icon {
-        width: 26px;
-        height: 26px;
-    }
     .nav-actions {
         gap: 8px;
     }
@@ -1425,4 +1398,36 @@ select:focus {
             padding-bottom: max(80px, calc(env(safe-area-inset-bottom) + 60px));
         }
     }
+}
+/* ── Verification / Reset screens ── */
+.auth-hint {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    text-align: center;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.auth-hint strong {
+    color: var(--text-primary);
+}
+
+.mt-8 {
+    margin-top: 8px;
+}
+
+.btn-link {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    cursor: pointer;
+    padding: 4px 0;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.2s;
+}
+
+.btn-link:hover {
+    color: var(--text-primary);
 }
