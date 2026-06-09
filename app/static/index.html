@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 
 <head>
     <meta charset="UTF-8">
@@ -131,6 +131,12 @@
                             <option value="GBP">£ GBP</option>
                         </select>
                     </div>
+                    <div class="currency-switcher">
+                        <select id="nav-lang" onchange="handleLangChange(this.value)">
+                            <option value="en">🇬🇧 EN</option>
+                            <option value="ru">🇷🇺 RU</option>
+                        </select>
+                    </div>
                     <button class="btn btn-secondary btn-sm" onclick="handleLogout()">Logout</button>
                 </div>
             </nav>
@@ -138,25 +144,25 @@
             <div class="dashboard-grid">
                 <div class="dashboard-sidebar">
                     <div class="card analytics-card">
-                        <h3 class="card-title">🚀 Expense Forecast</h3>
+                        <h3 class="card-title" data-i18n="forecast_title">🚀 Expense Forecast</h3>
                         <div class="forecast-grid">
                             <div class="forecast-item">
-                                <span class="forecast-label">Next 30 Days</span>
+                                <span class="forecast-label" data-i18n="forecast_30">Next 30 Days</span>
                                 <span id="forecast-30" class="forecast-value">0.00</span>
                             </div>
                             <div class="forecast-item">
-                                <span class="forecast-label">Next 90 Days</span>
+                                <span class="forecast-label" data-i18n="forecast_90">Next 90 Days</span>
                                 <span id="forecast-90" class="forecast-value">0.00</span>
                             </div>
                             <div class="forecast-item">
-                                <span class="forecast-label">Next 365 Days</span>
+                                <span class="forecast-label" data-i18n="forecast_365">Next 365 Days</span>
                                 <span id="forecast-365" class="forecast-value">0.00</span>
                             </div>
                         </div>
                     </div>
 
                     <div class="card analytics-card">
-                        <h3 class="card-title">📊 Current Month Spend</h3>
+                        <h3 class="card-title" data-i18n="spend_title">📊 Current Month Spend</h3>
                         <div class="chart-container">
                             <div id="chart-visual" class="chart-visual">
                                 <svg id="svg-donut" viewBox="0 0 100 100">
@@ -175,9 +181,9 @@
 
                 <div class="dashboard-main">
                     <div class="main-header">
-                        <h2 class="section-title">Subscriptions</h2>
+                        <h2 class="section-title" data-i18n="subscriptions">Subscriptions</h2>
                         <button class="btn btn-primary btn-with-icon" onclick="openSubscriptionModal()">
-                            <span>+</span> Add Subscription
+                            <span>+</span> <span data-i18n="add_subscription">Add Subscription</span>
                         </button>
                     </div>
 
@@ -198,59 +204,59 @@
                 <input type="hidden" id="sub-id">
 
                 <div class="form-group">
-                    <label for="sub-title">Title</label>
+                <label for="sub-title" data-i18n="lbl_title">Title</label>
                     <input type="text" id="sub-title" required placeholder="Netflix, AWS, Mobile Bill...">
                 </div>
 
                 <div class="form-row">
                     <div class="form-group flex-1">
-                        <label for="sub-amount">Price / Amount</label>
+                        <label for="sub-amount" data-i18n="lbl_amount">Price / Amount</label>
                         <input type="number" id="sub-amount" step="0.01" min="0.01" required placeholder="9.99">
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group flex-1">
-                        <label for="sub-period">Billing Period</label>
+                        <label for="sub-period" data-i18n="lbl_billing">Billing Period</label>
                         <select id="sub-period">
-                            <option value="month">Monthly</option>
-                            <option value="year">Annually</option>
+                            <option value="month" data-i18n="monthly">Monthly</option>
+                            <option value="year" data-i18n="annually">Annually</option>
                         </select>
                     </div>
                     <div class="form-group flex-1">
-                        <label for="sub-date">Next Payment Date</label>
-                        <input type="date" id="sub-date" required>
+                        <label for="sub-date" data-i18n="lbl_date">Next Payment Date</label>
+                        <input type="date" id="sub-date" required data-i18n-placeholder="date_placeholder">
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="sub-category">Category</label>
+                    <label for="sub-category" data-i18n="lbl_category">Category</label>
                     <div class="category-select-wrapper">
                         <select id="sub-category">
                             </select>
-                        <button type="button" class="btn btn-secondary btn-sm" onclick="showCustomCategoryInput()">Custom</button>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="showCustomCategoryInput()" data-i18n="custom">Custom</button>
                     </div>
                 </div>
 
                 <div id="custom-category-group" class="form-group hidden">
-                    <label for="custom-category-name">New Category Name</label>
+                    <label for="custom-category-name" data-i18n="new_category_name">New Category Name</label>
                     <div class="custom-category-input-row">
-                        <input type="text" id="custom-category-name" placeholder="E.g., Gym, Transport">
-                        <button type="button" class="btn btn-success btn-sm" onclick="saveCustomCategory()">Create</button>
-                        <button type="button" class="btn btn-secondary btn-sm" onclick="hideCustomCategoryInput()">Cancel</button>
+                        <input type="text" id="custom-category-name" placeholder="E.g., Gym, Transport" data-i18n-placeholder="category_placeholder">
+                        <button type="button" class="btn btn-success btn-sm" onclick="saveCustomCategory()" data-i18n="create">Create</button>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="hideCustomCategoryInput()" data-i18n="cancel_small">Cancel</button>
                     </div>
                 </div>
 
                 <div class="form-group form-checkbox">
                     <input type="checkbox" id="sub-active" checked>
-                    <label for="sub-active">Subscription is active</label>
+                    <label for="sub-active" data-i18n="lbl_active">Subscription is active</label>
                 </div>
 
                 <div id="modal-error" class="alert alert-error hidden"></div>
 
                 <div class="modal-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeSubscriptionModal()">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Subscription</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeSubscriptionModal()" data-i18n="cancel">Cancel</button>
+                    <button type="submit" class="btn btn-primary" data-i18n="save_subscription">Save Subscription</button>
                 </div>
             </form>
         </div>

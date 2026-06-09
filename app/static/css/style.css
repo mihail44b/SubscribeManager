@@ -190,6 +190,7 @@ h4 {
     display: flex;
     flex-direction: column;
     gap: 0;
+    margin-bottom: 20px;
 }
 
 .form-row .form-group {

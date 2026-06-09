@@ -3,6 +3,157 @@ let API_TOKEN = localStorage.getItem('token') || '';
 let currentUser = null;
 let categoriesList = [];
 let subscriptionsList = [];
+let currentLang = localStorage.getItem('lang') || 'en';
+
+// Translations
+const TRANSLATIONS = {
+    en: {
+        forecast_title: '🚀 Expense Forecast',
+        forecast_30: 'Next 30 Days',
+        forecast_90: 'Next 90 Days',
+        forecast_365: 'Next 365 Days',
+        spend_title: '📊 Current Month Spend',
+        subscriptions: 'Subscriptions',
+        add_subscription: 'Add Subscription',
+        add_subscription_title: 'Add Subscription',
+        edit_subscription_title: 'Edit Subscription',
+        lbl_title: 'Title',
+        lbl_amount: 'Price / Amount',
+        lbl_billing: 'Billing Period',
+        monthly: 'Monthly',
+        annually: 'Annually',
+        lbl_date: 'Next Payment Date',
+        lbl_category: 'Category',
+        lbl_active: 'Subscription is active',
+        cancel: 'Cancel',
+        save_subscription: 'Save Subscription',
+        logout: 'Logout',
+        custom: 'Custom',
+        new_category_name: 'New Category Name',
+        category_placeholder: 'E.g., Gym, Transport',
+        create: 'Create',
+        cancel_small: 'Cancel',
+        overdue: 'Overdue',
+        due_in: 'Due in',
+        days: 'd',
+        edit: 'Edit',
+        pay: 'Pay',
+        delete: 'Delete',
+        no_subs: '🪐 No subscriptions yet. Click "+ Add Subscription" to start tracking!',
+        per_month: '/mo',
+        per_year: '/yr',
+        toast_added: 'Subscription added',
+        toast_updated: 'Subscription updated',
+        toast_deleted: 'Subscription deleted',
+        toast_paid: 'Payment recorded',
+    },
+    ru: {
+        forecast_title: '🚀 Прогноз расходов',
+        forecast_30: 'След. 30 дней',
+        forecast_90: 'След. 90 дней',
+        forecast_365: 'След. 365 дней',
+        spend_title: '📊 Расходы за месяц',
+        subscriptions: 'Подписки',
+        add_subscription: 'Добавить подписку',
+        add_subscription_title: 'Добавить подписку',
+        edit_subscription_title: 'Редактировать подписку',
+        lbl_title: 'Название',
+        lbl_amount: 'Сумма',
+        lbl_billing: 'Период оплаты',
+        monthly: 'Ежемесячно',
+        annually: 'Ежегодно',
+        lbl_date: 'Дата следующей оплаты',
+        lbl_category: 'Категория',
+        lbl_active: 'Подписка активна',
+        cancel: 'Отмена',
+        save_subscription: 'Сохранить',
+        logout: 'Выйти',
+        custom: 'Своя',
+        new_category_name: 'Название новой категории',
+        category_placeholder: 'Например, Спортзал, Транспорт',
+        create: 'Создать',
+        cancel_small: 'Отмена',
+        overdue: 'Просрочено',
+        due_in: 'Через',
+        days: 'д',
+        edit: 'Изменить',
+        pay: 'Оплатить',
+        delete: 'Удалить',
+        no_subs: '🪐 Подписок пока нет. Нажми "+ Добавить подписку"!',
+        per_month: '/мес',
+        per_year: '/год',
+        toast_added: 'Подписка добавлена',
+        toast_updated: 'Подписка обновлена',
+        toast_deleted: 'Подписка удалена',
+        toast_paid: 'Оплата записана',
+    }
+};
+
+function t(key) {
+    return (TRANSLATIONS[currentLang] || TRANSLATIONS['en'])[key] || key;
+}
+
+function applyTranslations() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        el.textContent = t(el.getAttribute('data-i18n'));
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        el.placeholder = t(el.getAttribute('data-i18n-placeholder'));
+    });
+}
+
+function handleLangChange(lang) {
+    currentLang = lang;
+    localStorage.setItem('lang', lang);
+    document.documentElement.lang = lang === 'ru' ? 'ru-RU' : 'en-GB';
+    applyTranslations();
+    updateDateFieldLocale(lang);
+    renderSubscriptionsList();
+}
+
+// Switches the date input between native (en) and text mask (ru)
+function updateDateFieldLocale(lang) {
+    const field = document.getElementById('sub-date');
+    if (!field) return;
+    const currentVal = field.getAttribute('data-iso') || field.value;
+
+    if (lang === 'ru') {
+        // Switch to text input with dd.mm.yyyy display
+        field.type = 'text';
+        field.placeholder = 'дд.мм.гггг';
+        field.removeAttribute('required');
+        field.oninput = function() { maskDateRu(this); };
+        field.setAttribute('data-mode', 'ru');
+        // Convert existing iso value to display format
+        if (currentVal && currentVal.match(/^\d{4}-\d{2}-\d{2}$/)) {
+            const [y, m, d] = currentVal.split('-');
+            field.value = `${d}.${m}.${y}`;
+            field.setAttribute('data-iso', currentVal);
+        }
+    } else {
+        // Switch back to native date input
+        field.type = 'date';
+        field.placeholder = '';
+        field.setAttribute('required', '');
+        field.oninput = null;
+        field.removeAttribute('data-mode');
+        // Convert display format back to iso
+        const iso = field.getAttribute('data-iso') || '';
+        field.value = iso;
+    }
+}
+
+function maskDateRu(input) {
+    let v = input.value.replace(/\D/g, '').slice(0, 8);
+    if (v.length >= 3) v = v.slice(0,2) + '.' + v.slice(2);
+    if (v.length >= 6) v = v.slice(0,5) + '.' + v.slice(5);
+    input.value = v;
+    // Store iso value when complete
+    const parts = v.split('.');
+    if (parts.length === 3 && parts[2].length === 4) {
+        input.setAttribute('data-iso', `${parts[2]}-${parts[1]}-${parts[0]}`);
+    }
+}
 
 // API Endpoint configuration (Relative paths because it is served from FastAPI)
 const API_BASE = '/api';
@@ -27,6 +178,12 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initApp() {
+    document.documentElement.lang = currentLang === 'ru' ? 'ru-RU' : 'en-GB';
+    applyTranslations();
+    const langSelect = document.getElementById('nav-lang');
+    if (langSelect) langSelect.value = currentLang;
+    updateDateFieldLocale(currentLang);
+
     if (API_TOKEN) {
         showScreen('dashboard-screen');
         loadDashboardData();
@@ -394,7 +551,7 @@ function renderSubscriptionsList() {
     if (subscriptionsList.length === 0) {
         container.innerHTML = `
             <div class="card" style="padding: 40px; text-align: center; color: var(--text-secondary);">
-                🪐 No subscriptions yet. Click "+ Add Subscription" to start tracking!
+                ${t('no_subs')}
             </div>
         `;
         return;
@@ -414,9 +571,9 @@ function renderSubscriptionsList() {
                 let statusBadgeHtml = '';
                 if (sub.is_active) {
                     if (diffDays < 0) {
-                        statusBadgeHtml = `<span class="badge badge-overdue">Overdue (${Math.abs(diffDays)}d)</span>`;
+                        statusBadgeHtml = `<span class="badge badge-overdue">${t('overdue')} (${Math.abs(diffDays)}${t('days')})</span>`;
                     } else if (diffDays <= 2) {
-                        statusBadgeHtml = `<span class="badge badge-soon">Due in ${diffDays}d</span>`;
+                        statusBadgeHtml = `<span class="badge badge-soon">${t('due_in')} ${diffDays}${t('days')}</span>`;
                     }
                 }
 
@@ -479,7 +636,7 @@ async function paySubscription(id) {
 
         if (!response.ok) throw new Error('Payment recording failed');
         
-        showToast('Payment logged! Due date updated.');
+        showToast(t('toast_paid'));
         await loadSubscriptions();
         await loadAnalytics();
     } catch (err) {
@@ -499,7 +656,7 @@ async function deleteSubscription(id) {
 
         if (!response.ok) throw new Error('Deletion failed');
         
-        showToast('Subscription deleted');
+        showToast(t('toast_deleted'));
         await loadSubscriptions();
         await loadAnalytics();
     } catch (err) {
@@ -600,19 +757,36 @@ function openSubscriptionModal(subToEdit = null) {
     hideCustomCategoryInput();
 
     // Default dates is today
-    document.getElementById('sub-date').value = new Date().toISOString().substring(0, 10);
+    const todayIso = new Date().toISOString().substring(0, 10);
+    const dateField = document.getElementById('sub-date');
+    // Reset date field to today
+    dateField.removeAttribute('data-iso');
+    if (currentLang === 'ru') {
+        const [y, m, d] = todayIso.split('-');
+        dateField.value = `${d}.${m}.${y}`;
+        dateField.setAttribute('data-iso', todayIso);
+    } else {
+        dateField.value = todayIso;
+    }
 
     if (subToEdit) {
-        title.textContent = 'Edit Subscription';
+        title.textContent = t('edit_subscription_title');
         document.getElementById('sub-id').value = subToEdit.id;
         document.getElementById('sub-title').value = subToEdit.title;
         document.getElementById('sub-amount').value = subToEdit.amount;
         document.getElementById('sub-period').value = subToEdit.billing_period;
-        document.getElementById('sub-date').value = subToEdit.next_payment_date;
+        const isoDate = subToEdit.next_payment_date;
+        if (currentLang === 'ru') {
+            const [y, m, d] = isoDate.split('-');
+            dateField.value = `${d}.${m}.${y}`;
+            dateField.setAttribute('data-iso', isoDate);
+        } else {
+            dateField.value = isoDate;
+        }
         document.getElementById('sub-category').value = subToEdit.category_id || '';
         document.getElementById('sub-active').checked = subToEdit.is_active;
     } else {
-        title.textContent = 'Add Subscription';
+        title.textContent = t('add_subscription_title');
         document.getElementById('sub-id').value = '';
     }
 
@@ -635,9 +809,11 @@ async function handleSubSubmit(event) {
     const id = document.getElementById('sub-id').value;
     const title = document.getElementById('sub-title').value;
     const amount = parseFloat(document.getElementById('sub-amount').value);
-    const currency = currentUser ? currentUser.currency : 'USD';
     const billing_period = document.getElementById('sub-period').value;
-    const next_payment_date = document.getElementById('sub-date').value;
+    const dateField = document.getElementById('sub-date');
+    const next_payment_date = dateField.getAttribute('data-mode') === 'ru'
+        ? dateField.getAttribute('data-iso') || ''
+        : dateField.value;
     const category_id = document.getElementById('sub-category').value ? parseInt(document.getElementById('sub-category').value) : null;
     const is_active = document.getElementById('sub-active').checked;
     const errDiv = document.getElementById('modal-error');
@@ -645,7 +821,6 @@ async function handleSubSubmit(event) {
     const subData = {
         title,
         amount,
-        currency,
         billing_period,
         next_payment_date,
         category_id
@@ -669,11 +844,15 @@ async function handleSubSubmit(event) {
 
         if (!response.ok) {
             const data = await response.json();
-            throw new Error(data.detail || 'Failed to save subscription');
+            const detail = data.detail;
+            const message = Array.isArray(detail)
+                ? detail.map(e => e.msg).join(', ')
+                : (detail || 'Failed to save subscription');
+            throw new Error(message);
         }
 
         closeSubscriptionModal();
-        showToast(id ? 'Subscription updated' : 'Subscription added');
+        showToast(id ? t('toast_updated') : t('toast_added'));
         await loadSubscriptions();
         await loadAnalytics();
     } catch (err) {
