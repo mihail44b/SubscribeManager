@@ -46,6 +46,10 @@ const TRANSLATIONS = {
         toast_updated: 'Subscription updated',
         toast_deleted: 'Subscription deleted',
         toast_paid: 'Payment recorded',
+        err_save_sub: 'Failed to save subscription',
+        err_server: 'Server error. Check the entered values.',
+        err_generic: 'Error',
+        err_amount_too_large: 'Amount is too large. Maximum is 99,999,999.99',
     },
     ru: {
         forecast_title: '🚀 Прогноз расходов',
@@ -86,6 +90,10 @@ const TRANSLATIONS = {
         toast_updated: 'Подписка обновлена',
         toast_deleted: 'Подписка удалена',
         toast_paid: 'Оплата записана',
+        err_save_sub: 'Не удалось сохранить подписку',
+        err_server: 'Ошибка сервера. Проверьте введённые значения.',
+        err_generic: 'Ошибка',
+        err_amount_too_large: 'Сумма слишком большая. Максимум: 99 999 999.99',
     }
 };
 
@@ -843,11 +851,26 @@ async function handleSubSubmit(event) {
         });
 
         if (!response.ok) {
-            const data = await response.json();
-            const detail = data.detail;
-            const message = Array.isArray(detail)
-                ? detail.map(e => e.msg).join(', ')
-                : (detail || 'Failed to save subscription');
+            let message = t('err_save_sub');
+            try {
+                const data = await response.json();
+                const detail = data.detail;
+                if (Array.isArray(detail)) {
+                    const raw = detail.map(e => e.msg).join(', ');
+                    // Replace Pydantic's technical messages with user-friendly ones
+                    if (raw.toLowerCase().includes('less than')) {
+                        message = t('err_amount_too_large');
+                    } else {
+                        message = raw;
+                    }
+                } else {
+                    message = detail || message;
+                }
+            } catch (_) {
+                message = response.status === 500
+                    ? t('err_server')
+                    : `${t('err_generic')} ${response.status}`;
+            }
             throw new Error(message);
         }
 

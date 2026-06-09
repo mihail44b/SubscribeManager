@@ -62,14 +62,14 @@ class CategoryResponse(BaseModel):
 # Subscription schemas
 class SubscriptionCreate(BaseModel):
     title: str = Field(..., min_length=1, max_length=255)
-    amount: Decimal = Field(..., gt=0)
+    amount: Decimal = Field(..., gt=0, le=9999999.99, description="Max amount is 9,999,999.99")
     billing_period: str = Field(..., pattern="^(month|year)$")
     next_payment_date: date
     category_id: Optional[int] = None
 
 class SubscriptionUpdate(BaseModel):
     title: Optional[str] = Field(None, min_length=1, max_length=255)
-    amount: Optional[Decimal] = Field(None, gt=0)
+    amount: Optional[Decimal] = Field(None, gt=0, le=9999999.99)
     billing_period: Optional[str] = Field(None, pattern="^(month|year)$")
     next_payment_date: Optional[date] = None
     category_id: Optional[int] = None
