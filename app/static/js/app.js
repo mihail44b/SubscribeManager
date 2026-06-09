@@ -212,18 +212,18 @@ function showScreen(screenId) {
 function showAuthForm(form) {
     const forms = ['login-form', 'register-form', 'verify-screen', 'forgot-screen', 'reset-screen'];
     const tabs = document.getElementById('auth-tabs') || document.querySelector('.auth-tabs');
-    forms.forEach(f => document.getElementById(f) ? .classList.add('hidden'));
-    document.getElementById('auth-error') ? .classList.add('hidden');
-    document.getElementById('verify-error') ? .classList.add('hidden');
-    document.getElementById('forgot-error') ? .classList.add('hidden');
-    document.getElementById('reset-error') ? .classList.add('hidden');
+    forms.forEach(f => document.getElementById(f)?.classList.add('hidden'));
+    document.getElementById('auth-error')?.classList.add('hidden');
+    document.getElementById('verify-error')?.classList.add('hidden');
+    document.getElementById('forgot-error')?.classList.add('hidden');
+    document.getElementById('reset-error')?.classList.add('hidden');
 
     if (form === 'login' || form === 'register') {
         if (tabs) tabs.classList.remove('hidden');
         switchAuthTab(form);
     } else {
         if (tabs) tabs.classList.add('hidden');
-        document.getElementById(`${form}-screen`) ? .classList.remove('hidden');
+        document.getElementById(`${form}-screen`)?.classList.remove('hidden');
     }
     showScreen('auth-screen');
 }
