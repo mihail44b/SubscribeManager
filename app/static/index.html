@@ -123,6 +123,9 @@
                         <span id="user-email" class="user-email"></span>
                         <div class="email-popover hidden" id="email-popover"></div>
                     </div>
+                    <button class="btn btn-secondary btn-sm" onclick="handleLogout()" data-i18n="logout">Logout</button>
+                </div>
+                <div class="nav-controls">
                     <div class="currency-switcher">
                         <select id="nav-currency" onchange="handleCurrencyChange(this.value)">
                             <option value="USD">$ USD</option>
@@ -137,7 +140,6 @@
                             <option value="ru">🇷🇺 RU</option>
                         </select>
                     </div>
-                    <button class="btn btn-secondary btn-sm" onclick="handleLogout()">Logout</button>
                 </div>
             </nav>
 

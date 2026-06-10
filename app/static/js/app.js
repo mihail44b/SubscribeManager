@@ -42,6 +42,11 @@ const TRANSLATIONS = {
         no_subs: '🪐 No subscriptions yet. Click "+ Add Subscription" to start tracking!',
         per_month: '/mo',
         per_year: '/yr',
+        next_date: 'Next',
+        paid_badge: 'Paid',
+        mark_paid: 'Mark as Paid',
+        period_month: 'month',
+        period_year: 'year',
         toast_added: 'Subscription added',
         toast_updated: 'Subscription updated',
         toast_deleted: 'Subscription deleted',
@@ -86,6 +91,11 @@ const TRANSLATIONS = {
         no_subs: '🪐 Подписок пока нет. Нажми "+ Добавить подписку"!',
         per_month: '/мес',
         per_year: '/год',
+        next_date: 'След.',
+        paid_badge: 'Оплачено',
+        mark_paid: 'Отметить оплаченным',
+        period_month: 'мес',
+        period_year: 'год',
         toast_added: 'Подписка добавлена',
         toast_updated: 'Подписка обновлена',
         toast_deleted: 'Подписка удалена',
@@ -109,6 +119,12 @@ function applyTranslations() {
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
         el.placeholder = t(el.getAttribute('data-i18n-placeholder'));
     });
+    // Update sub-period select options if visible
+    const periodSelect = document.getElementById('sub-period');
+    if (periodSelect) {
+        periodSelect.options[0].textContent = t('monthly');
+        periodSelect.options[1].textContent = t('annually');
+    }
 }
 
 function handleLangChange(lang) {
@@ -610,7 +626,7 @@ function renderSubscriptionsList() {
                     <div class="sub-meta">
                         <span class="sub-category-badge">${escapeHTML(categoryName)}</span>
                         <span class="sub-date-badge">
-                            Next: ${formatDate(sub.next_payment_date)}
+                            ${t('next_date')}: ${formatDate(sub.next_payment_date)}
                             ${statusBadgeHtml}
                         </span>
                     </div>
@@ -620,11 +636,11 @@ function renderSubscriptionsList() {
             <div class="sub-actions-container">
                 <div class="sub-pricing">
                     <span class="sub-cost">${sub.amount} ${displayCurrency}</span>
-                    <span class="sub-freq">/ ${sub.billing_period}</span>
+                    <span class="sub-freq">/ ${sub.billing_period === 'month' ? t('period_month') : t('period_year')}</span>
                 </div>
                 <div class="sub-actions">
                     ${sub.is_active ? `
-                        ${sub.is_paid ? `<span class="badge badge-paid">Paid</span>` : `<button class="action-icon-btn btn-pay" title="Mark as Paid" onclick="paySubscription(${sub.id})">✓ Paid</button>`}
+                        ${sub.is_paid ? `<span class="badge badge-paid">${t('paid_badge')}</span>` : `<button class="action-icon-btn btn-pay" title="${t('mark_paid')}" onclick="paySubscription(${sub.id})">✓ ${t('paid_badge')}</button>`}
                     ` : ''}
                     <button class="action-icon-btn btn-edit" title="Edit" onclick="editSubscription(${sub.id})"><img src="/static/icons/edit.svg" alt="Edit" class="icon"></button>
                     <button class="action-icon-btn btn-delete" title="Delete" onclick="deleteSubscription(${sub.id})"><img src="/static/icons/bin.svg" alt="Delete" class="icon"></button>

@@ -406,6 +406,12 @@ select:focus {
     gap: 10px;
 }
 
+.nav-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 
 /* User avatar wrap — avatar on mobile, email text on desktop */
 
@@ -826,6 +832,8 @@ select:focus {
 .sub-pricing {
     text-align: left;
     margin-right: 0;
+    word-break: break-word;
+    min-width: 0;
 }
 
 .sub-cost {
@@ -833,6 +841,7 @@ select:focus {
     font-weight: 700;
     font-size: 1.25rem;
     color: var(--text-primary);
+    word-break: break-all;
 }
 
 .sub-freq {
@@ -1043,6 +1052,8 @@ select:focus {
     font-weight: bold;
     padding: 0 12px;
     width: auto;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 
@@ -1154,23 +1165,56 @@ select:focus {
         padding: 32px 20px;
         border: none;
     }
-    /* Navbar — tighter on mobile */
+    /* Navbar — two rows on mobile */
     .navbar {
         padding: 12px 14px;
         margin-bottom: 16px;
         border-radius: 12px;
+        display: grid;
+        grid-template-columns: auto 1fr;
+        grid-template-rows: auto auto;
+        gap: 6px 8px;
+        align-items: center;
+    }
+    .nav-brand {
+        grid-column: 1;
+        grid-row: 1 / 3;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
         gap: 8px;
+        align-self: stretch;
     }
     .nav-brand .logo-text {
-        font-size: 1.1rem;
+        font-size: 1.3rem;
     }
+    .nav-brand .logo-icon {
+        width: 34px;
+        height: 34px;
+    }
+    /* Row 1: avatar + logout pushed right */
     .nav-actions {
+        grid-column: 2;
+        grid-row: 1;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
         gap: 8px;
     }
     .user-email {
         display: none;
     }
-    /* Currency switcher stays visible but compact */
+    /* Row 2: selectors pushed right */
+    .nav-controls {
+        grid-column: 2;
+        grid-row: 2;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 8px;
+        width: auto;
+    }
+    /* Currency switcher compact */
     .currency-switcher select {
         font-size: 0.8rem;
         padding: 7px 24px 7px 10px;
